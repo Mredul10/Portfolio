@@ -75,7 +75,7 @@ class WorkCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.only(left: 10,right: 10,bottom: 10),
                 child: Text(
                   worksModel.description!,
                   maxLines: 5,

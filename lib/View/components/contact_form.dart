@@ -3,8 +3,54 @@ import 'package:portfolio/Reposnive/responsive.dart';
 import 'package:portfolio/Utils/colors.dart';
 import 'package:portfolio/Utils/text_style.dart';
 
-class ContactForm extends StatelessWidget {
+class ContactForm extends StatefulWidget {
   const ContactForm({super.key});
+
+  @override
+  _ContactFormState createState() => _ContactFormState();
+}
+
+class _ContactFormState extends State<ContactForm> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+  bool _isLoading = false;
+
+  void _submitForm() async {
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _messageController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill in all required fields.")),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 2)); // Simulating network request
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Success"),
+        content: const Text("Message sent successfully!"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +81,10 @@ class ContactForm extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  contactFormField("Name*", 1, "Your Name"),
-                  contactFormField("Email*", 1, "Your Email"),
-                  contactFormField("Phone Number", 1, "Your Number"),
-                  contactFormField("Message*", 10, "Your Message"),
+                  contactFormField("Name*", 1, "Your Name", _nameController),
+                  contactFormField("Email*", 1, "Your Email", _emailController),
+                  contactFormField("Phone Number", 1, "Your Number", _phoneController),
+                  contactFormField("Message*", 10, "Your Message", _messageController),
                   Row(
                     children: [
                       Expanded(
@@ -46,15 +92,17 @@ class ContactForm extends StatelessWidget {
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.blue,
                           ),
-                          onPressed: () {},
-                          child: const Text(
-                            'Submit',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          onPressed: _isLoading ? null : _submitForm,
+                          child: _isLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                     ],
@@ -68,7 +116,7 @@ class ContactForm extends StatelessWidget {
     );
   }
 
-  contactFormField(name, maxLine, hintText) {
+  contactFormField(String name, int maxLine, String hintText, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -85,6 +133,7 @@ class ContactForm extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: TextField(
+              controller: controller,
               maxLines: maxLine,
               decoration: InputDecoration(
                   hintText: hintText,
